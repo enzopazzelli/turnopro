@@ -6,6 +6,7 @@ import {
   ArrowRight, FileText, CreditCard, Clock, Star, Zap,
 } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
+import { createClient } from "@/lib/supabase/server";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { SelectorProfesion } from "@/components/landing/selector-profesion";
 import { ComoFunciona } from "@/components/landing/como-funciona";
@@ -88,7 +89,20 @@ const features = [
   },
 ];
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  // Leer precios desde la tabla planes (fallback a hardcoded si falla)
+  let preciosDB = {};
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("planes")
+      .select("nombre, precio, descripcion")
+      .eq("activo", true);
+    if (data) {
+      data.forEach((p) => { preciosDB[p.nombre] = p; });
+    }
+  } catch (_) {}
+
   return (
     <div className="min-h-screen flex flex-col bg-background bg-dot-pattern">
 
@@ -297,7 +311,7 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-4xl font-bold">Precios claros, sin sorpresas</h2>
             <p className="text-muted-foreground mt-3">Empezá gratis y escalá cuando lo necesités.</p>
           </div>
-          <Precios />
+          <Precios preciosDB={preciosDB} />
         </div>
       </section>
 

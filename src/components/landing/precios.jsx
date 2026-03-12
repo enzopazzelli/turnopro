@@ -77,10 +77,20 @@ const planes = [
   },
 ];
 
-export function Precios() {
+function formatPrecio(val) {
+  if (!val || val === 0) return "Gratis";
+  return "$" + Number(val).toLocaleString("es-AR");
+}
+
+export function Precios({ preciosDB = {} }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 items-start">
-      {planes.map((plan) => (
+      {planes.map((plan) => {
+        const key = plan.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const db = preciosDB[key];
+        const precioMostrar = db ? formatPrecio(db.precio) : plan.precio;
+        const descMostrar = db?.descripcion || plan.descripcion;
+        return (
         <div
           key={plan.nombre}
           className={`relative rounded-2xl border p-6 flex flex-col gap-5 ${
@@ -100,10 +110,10 @@ export function Precios() {
           <div>
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">{plan.nombre}</p>
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-bold">{plan.precio}</span>
+              <span className="text-3xl font-bold">{precioMostrar}</span>
               <span className="text-sm text-muted-foreground">{plan.periodo}</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{plan.descripcion}</p>
+            <p className="text-xs text-muted-foreground mt-1">{descMostrar}</p>
           </div>
 
           <ul className="space-y-2 flex-1">
@@ -131,7 +141,8 @@ export function Precios() {
             </Link>
           </Button>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
