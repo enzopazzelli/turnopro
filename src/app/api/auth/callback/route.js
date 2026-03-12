@@ -44,11 +44,11 @@ export async function GET(request) {
     return NextResponse.redirect(`${origin}/login?error=no_user`);
   }
 
-  const { data: perfil } = await supabase
-    .from("users")
-    .select("id, rol")
-    .eq("auth_id", user.id)
-    .maybeSingle();
+  // Usar RPC SECURITY DEFINER para evitar problemas de RLS tras verifyOtp
+  const { data: rows } = await supabase.rpc("obtener_perfil_usuario", {
+    p_auth_id: user.id,
+  });
+  const perfil = rows?.[0] ?? null;
 
   if (perfil) {
     if (perfil.rol === "superadmin") {

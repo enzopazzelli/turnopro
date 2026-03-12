@@ -306,7 +306,8 @@ export async function eliminarTenants(tenantIds) {
 export async function impersonarTenant(tenantId) {
   await verificarSuperadmin();
   const admin = createAdminClient();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
   // Buscar el usuario profesional principal del tenant
   const { data: usuario } = await admin
@@ -386,7 +387,8 @@ export async function cambiarContrasenaUsuario(authId, nuevaContrasena) {
 export async function generarLinkAcceso(email) {
   const adminUser = await verificarSuperadmin();
   const admin = createAdminClient();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
   const { data, error } = await admin.auth.admin.generateLink({
     type: "magiclink",
