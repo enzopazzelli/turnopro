@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { SidebarDesktop } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import { AuthProvider } from "@/components/layout/auth-provider";
@@ -20,13 +19,11 @@ export default async function DashboardLayout({ children }) {
     redirect("/login");
   }
 
-  // Fetch user profile — admin client bypasses RLS (auth.uid() puede ser null en SSR)
-  const adminClient = createAdminClient();
-  const { data: usuario } = await adminClient
-    .from("users")
-    .select("*")
-    .eq("auth_id", user.id)
-    .single();
+  // RPC SECURITY DEFINER bypasea RLS sin depender del admin client
+  const { data: rows } = await supabase.rpc("obtener_perfil_usuario", {
+    p_auth_id: user.id,
+  });
+  const usuario = rows?.[0] ?? null;
 
   if (!usuario) {
     redirect("/onboarding");

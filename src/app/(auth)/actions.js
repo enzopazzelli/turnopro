@@ -3,7 +3,6 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { loginSchema, registroSchema } from "@/lib/validations/auth";
 import { registrarAuditLog } from "@/lib/audit";
 
@@ -36,17 +35,13 @@ export async function iniciarSesion(prevState, formData) {
     };
   }
 
-  // Audit log + detectar rol para redirect
-  // Usamos adminClient para bypass RLS: auth.uid() puede ser null
-  // en server actions justo después de signInWithPassword
+  // Audit log + detectar rol para redirect (RPC SECURITY DEFINER bypasea RLS)
   let redirectTo = "/dashboard";
   if (authData?.user) {
-    const adminClient = createAdminClient();
-    const { data: usuario } = await adminClient
-      .from("users")
-      .select("id, tenant_id, rol")
-      .eq("auth_id", authData.user.id)
-      .single();
+    const { data: rows } = await supabase.rpc("obtener_perfil_usuario", {
+      p_auth_id: authData.user.id,
+    });
+    const usuario = rows?.[0] ?? null;
     if (usuario) {
       await registrarAuditLog({
         tenant_id: usuario.tenant_id,
@@ -148,9 +143,8 @@ export async function registrarse(prevState, formData) {
   // Guardar plan_interes en configuracion del tenant si vino desde precios
   if (planInteres && rpcData?.tenant_id) {
     try {
-      const admin = createAdminClient();
-      const { data: t } = await admin.from("tenants").select("configuracion").eq("id", rpcData.tenant_id).single();
-      await admin.from("tenants").update({
+      const { data: t } = await supabase.from("tenants").select("configuracion").eq("id", rpcData.tenant_id).single();
+      await supabase.from("tenants").update({
         configuracion: { ...(t?.configuracion || {}), plan_interes: planInteres },
       }).eq("id", rpcData.tenant_id);
     } catch (_) {

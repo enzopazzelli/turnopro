@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { OnboardingWizard } from "@/components/auth/onboarding-wizard";
 import { CalendarDays } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
@@ -20,14 +19,12 @@ export default async function OnboardingPage() {
     redirect("/login");
   }
 
-  // Si ya tiene registro en users, redirigir al dashboard
-  // Usamos adminClient para bypass RLS
-  const adminClient = createAdminClient();
-  const { data: existente } = await adminClient
-    .from("users")
-    .select("id, rol")
-    .eq("auth_id", user.id)
-    .maybeSingle();
+  // Si ya tiene registro en users, redirigir al destino correcto
+  // RPC SECURITY DEFINER bypasea RLS sin depender del admin client
+  const { data: rows } = await supabase.rpc("obtener_perfil_usuario", {
+    p_auth_id: user.id,
+  });
+  const existente = rows?.[0] ?? null;
 
   if (existente) {
     if (existente.rol === "superadmin") redirect("/superadmin");

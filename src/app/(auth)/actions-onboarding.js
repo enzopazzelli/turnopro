@@ -48,14 +48,14 @@ export async function completarOnboarding(prevState, formData) {
     };
   }
 
-  // Verificar que no tenga ya un tenant
-  const { data: existente } = await supabase
-    .from("users")
-    .select("id")
-    .eq("auth_id", user.id)
-    .maybeSingle();
+  // Verificar que no tenga ya un perfil (RPC SECURITY DEFINER bypasea RLS)
+  const { data: rows } = await supabase.rpc("obtener_perfil_usuario", {
+    p_auth_id: user.id,
+  });
+  const existente = rows?.[0] ?? null;
 
   if (existente) {
+    if (existente.rol === "superadmin") redirect("/superadmin");
     redirect("/dashboard");
   }
 
