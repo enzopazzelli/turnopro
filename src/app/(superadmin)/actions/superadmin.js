@@ -15,11 +15,10 @@ async function verificarSuperadmin() {
   } = await supabase.auth.getUser();
   if (!user) throw new Error("No autenticado");
 
-  const { data: usuario } = await supabase
-    .from("users")
-    .select("id, rol, nombre_completo, tenant_id")
-    .eq("auth_id", user.id)
-    .single();
+  const { data: rows } = await supabase.rpc("obtener_perfil_usuario", {
+    p_auth_id: user.id,
+  });
+  const usuario = rows?.[0] ?? null;
 
   if (!usuario || usuario.rol !== "superadmin") {
     throw new Error("Acceso denegado");
