@@ -62,12 +62,16 @@ CREATE INDEX IF NOT EXISTS idx_lista_espera_fecha ON lista_espera(fecha_preferid
 
 ALTER TABLE lista_espera ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "lista_espera_select" ON lista_espera;
 CREATE POLICY "lista_espera_select" ON lista_espera
   FOR SELECT USING (tenant_id = public.get_tenant_id_for_user());
+DROP POLICY IF EXISTS "lista_espera_insert" ON lista_espera;
 CREATE POLICY "lista_espera_insert" ON lista_espera
   FOR INSERT WITH CHECK (tenant_id = public.get_tenant_id_for_user());
+DROP POLICY IF EXISTS "lista_espera_update" ON lista_espera;
 CREATE POLICY "lista_espera_update" ON lista_espera
   FOR UPDATE USING (tenant_id = public.get_tenant_id_for_user());
+DROP POLICY IF EXISTS "lista_espera_delete" ON lista_espera;
 CREATE POLICY "lista_espera_delete" ON lista_espera
   FOR DELETE USING (tenant_id = public.get_tenant_id_for_user());
 

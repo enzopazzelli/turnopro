@@ -28,11 +28,13 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 
 -- Cada tenant ve sus propios logs (via RLS normal)
+DROP POLICY IF EXISTS "audit_logs_tenant_select" ON audit_logs;
 CREATE POLICY "audit_logs_tenant_select" ON audit_logs
   FOR SELECT TO authenticated
   USING (tenant_id = get_tenant_id_for_user());
 
 -- Cualquier usuario autenticado puede insertar logs propios
+DROP POLICY IF EXISTS "audit_logs_insert" ON audit_logs;
 CREATE POLICY "audit_logs_insert" ON audit_logs
   FOR INSERT TO authenticated
   WITH CHECK (true);

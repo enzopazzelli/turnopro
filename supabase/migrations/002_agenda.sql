@@ -17,7 +17,7 @@ $$ LANGUAGE sql SECURITY DEFINER STABLE;
 -- ============================================
 -- 2. TABLA: servicios
 -- ============================================
-CREATE TABLE public.servicios (
+CREATE TABLE IF NOT EXISTS public.servicios (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   nombre TEXT NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE public.servicios (
 -- ============================================
 -- 3. TABLA: disponibilidad
 -- ============================================
-CREATE TABLE public.disponibilidad (
+CREATE TABLE IF NOT EXISTS public.disponibilidad (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   professional_id UUID NOT NULL REFERENCES public.professionals(id) ON DELETE CASCADE,
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
@@ -49,7 +49,7 @@ CREATE TABLE public.disponibilidad (
 -- ============================================
 -- 4. TABLA: fechas_bloqueadas
 -- ============================================
-CREATE TABLE public.fechas_bloqueadas (
+CREATE TABLE IF NOT EXISTS public.fechas_bloqueadas (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   professional_id UUID NOT NULL REFERENCES public.professionals(id) ON DELETE CASCADE,
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
@@ -64,7 +64,7 @@ CREATE TABLE public.fechas_bloqueadas (
 -- ============================================
 -- 5. TABLA: citas
 -- ============================================
-CREATE TABLE public.citas (
+CREATE TABLE IF NOT EXISTS public.citas (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   professional_id UUID NOT NULL REFERENCES public.professionals(id) ON DELETE CASCADE,
@@ -85,27 +85,30 @@ CREATE TABLE public.citas (
 -- ============================================
 -- 6. INDICES
 -- ============================================
-CREATE INDEX idx_servicios_tenant_id ON public.servicios(tenant_id);
-CREATE INDEX idx_disponibilidad_professional_id ON public.disponibilidad(professional_id);
-CREATE INDEX idx_disponibilidad_tenant_id ON public.disponibilidad(tenant_id);
-CREATE INDEX idx_fechas_bloqueadas_professional_id ON public.fechas_bloqueadas(professional_id);
-CREATE INDEX idx_fechas_bloqueadas_fecha ON public.fechas_bloqueadas(fecha);
-CREATE INDEX idx_citas_tenant_id ON public.citas(tenant_id);
-CREATE INDEX idx_citas_professional_id ON public.citas(professional_id);
-CREATE INDEX idx_citas_fecha ON public.citas(fecha);
-CREATE INDEX idx_citas_estado ON public.citas(estado);
+CREATE INDEX IF NOT EXISTS idx_servicios_tenant_id ON public.servicios(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_disponibilidad_professional_id ON public.disponibilidad(professional_id);
+CREATE INDEX IF NOT EXISTS idx_disponibilidad_tenant_id ON public.disponibilidad(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_fechas_bloqueadas_professional_id ON public.fechas_bloqueadas(professional_id);
+CREATE INDEX IF NOT EXISTS idx_fechas_bloqueadas_fecha ON public.fechas_bloqueadas(fecha);
+CREATE INDEX IF NOT EXISTS idx_citas_tenant_id ON public.citas(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_citas_professional_id ON public.citas(professional_id);
+CREATE INDEX IF NOT EXISTS idx_citas_fecha ON public.citas(fecha);
+CREATE INDEX IF NOT EXISTS idx_citas_estado ON public.citas(estado);
 
 -- ============================================
 -- 7. TRIGGERS (reusar actualizar_updated_at)
 -- ============================================
+DROP TRIGGER IF EXISTS trigger_servicios_updated_at ON public.servicios;
 CREATE TRIGGER trigger_servicios_updated_at
   BEFORE UPDATE ON public.servicios
   FOR EACH ROW EXECUTE FUNCTION public.actualizar_updated_at();
 
+DROP TRIGGER IF EXISTS trigger_disponibilidad_updated_at ON public.disponibilidad;
 CREATE TRIGGER trigger_disponibilidad_updated_at
   BEFORE UPDATE ON public.disponibilidad
   FOR EACH ROW EXECUTE FUNCTION public.actualizar_updated_at();
 
+DROP TRIGGER IF EXISTS trigger_citas_updated_at ON public.citas;
 CREATE TRIGGER trigger_citas_updated_at
   BEFORE UPDATE ON public.citas
   FOR EACH ROW EXECUTE FUNCTION public.actualizar_updated_at();
@@ -121,28 +124,33 @@ ALTER TABLE public.citas ENABLE ROW LEVEL SECURITY;
 -- ============================================
 -- 9. POLITICAS RLS: servicios
 -- ============================================
+DROP POLICY IF EXISTS "Usuarios ven servicios de su tenant" ON public.servicios;
 CREATE POLICY "Usuarios ven servicios de su tenant"
   ON public.servicios FOR SELECT
   TO authenticated
   USING (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "Usuarios crean servicios en su tenant" ON public.servicios;
 CREATE POLICY "Usuarios crean servicios en su tenant"
   ON public.servicios FOR INSERT
   TO authenticated
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "Usuarios actualizan servicios de su tenant" ON public.servicios;
 CREATE POLICY "Usuarios actualizan servicios de su tenant"
   ON public.servicios FOR UPDATE
   TO authenticated
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "Usuarios eliminan servicios de su tenant" ON public.servicios;
 CREATE POLICY "Usuarios eliminan servicios de su tenant"
   ON public.servicios FOR DELETE
   TO authenticated
   USING (tenant_id = public.get_tenant_id_for_user());
 
 -- Acceso anonimo a servicios activos (pagina publica)
+DROP POLICY IF EXISTS "Acceso publico a servicios activos" ON public.servicios;
 CREATE POLICY "Acceso publico a servicios activos"
   ON public.servicios FOR SELECT
   TO anon
@@ -151,28 +159,33 @@ CREATE POLICY "Acceso publico a servicios activos"
 -- ============================================
 -- 10. POLITICAS RLS: disponibilidad
 -- ============================================
+DROP POLICY IF EXISTS "Usuarios ven disponibilidad de su tenant" ON public.disponibilidad;
 CREATE POLICY "Usuarios ven disponibilidad de su tenant"
   ON public.disponibilidad FOR SELECT
   TO authenticated
   USING (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "Usuarios crean disponibilidad en su tenant" ON public.disponibilidad;
 CREATE POLICY "Usuarios crean disponibilidad en su tenant"
   ON public.disponibilidad FOR INSERT
   TO authenticated
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "Usuarios actualizan disponibilidad de su tenant" ON public.disponibilidad;
 CREATE POLICY "Usuarios actualizan disponibilidad de su tenant"
   ON public.disponibilidad FOR UPDATE
   TO authenticated
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "Usuarios eliminan disponibilidad de su tenant" ON public.disponibilidad;
 CREATE POLICY "Usuarios eliminan disponibilidad de su tenant"
   ON public.disponibilidad FOR DELETE
   TO authenticated
   USING (tenant_id = public.get_tenant_id_for_user());
 
 -- Acceso anonimo (pagina publica de reserva)
+DROP POLICY IF EXISTS "Acceso publico a disponibilidad activa" ON public.disponibilidad;
 CREATE POLICY "Acceso publico a disponibilidad activa"
   ON public.disponibilidad FOR SELECT
   TO anon
@@ -181,16 +194,19 @@ CREATE POLICY "Acceso publico a disponibilidad activa"
 -- ============================================
 -- 11. POLITICAS RLS: fechas_bloqueadas
 -- ============================================
+DROP POLICY IF EXISTS "Usuarios ven fechas bloqueadas de su tenant" ON public.fechas_bloqueadas;
 CREATE POLICY "Usuarios ven fechas bloqueadas de su tenant"
   ON public.fechas_bloqueadas FOR SELECT
   TO authenticated
   USING (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "Usuarios crean fechas bloqueadas en su tenant" ON public.fechas_bloqueadas;
 CREATE POLICY "Usuarios crean fechas bloqueadas en su tenant"
   ON public.fechas_bloqueadas FOR INSERT
   TO authenticated
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "Usuarios eliminan fechas bloqueadas de su tenant" ON public.fechas_bloqueadas;
 CREATE POLICY "Usuarios eliminan fechas bloqueadas de su tenant"
   ON public.fechas_bloqueadas FOR DELETE
   TO authenticated
@@ -199,22 +215,26 @@ CREATE POLICY "Usuarios eliminan fechas bloqueadas de su tenant"
 -- ============================================
 -- 12. POLITICAS RLS: citas
 -- ============================================
+DROP POLICY IF EXISTS "Usuarios ven citas de su tenant" ON public.citas;
 CREATE POLICY "Usuarios ven citas de su tenant"
   ON public.citas FOR SELECT
   TO authenticated
   USING (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "Usuarios crean citas en su tenant" ON public.citas;
 CREATE POLICY "Usuarios crean citas en su tenant"
   ON public.citas FOR INSERT
   TO authenticated
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "Usuarios actualizan citas de su tenant" ON public.citas;
 CREATE POLICY "Usuarios actualizan citas de su tenant"
   ON public.citas FOR UPDATE
   TO authenticated
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "Usuarios eliminan citas de su tenant" ON public.citas;
 CREATE POLICY "Usuarios eliminan citas de su tenant"
   ON public.citas FOR DELETE
   TO authenticated

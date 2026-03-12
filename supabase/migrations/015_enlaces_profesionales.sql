@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS enlaces_profesionales (
 
 ALTER TABLE enlaces_profesionales ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "acceso_por_tenant" ON enlaces_profesionales;
 CREATE POLICY "acceso_por_tenant" ON enlaces_profesionales
   USING (tenant_id = get_tenant_id_for_user())
   WITH CHECK (tenant_id = get_tenant_id_for_user());

@@ -24,6 +24,7 @@ CREATE TRIGGER trigger_planes_updated_at
 
 -- RLS: solo superadmin puede gestionar planes (se usa service role)
 ALTER TABLE planes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "planes_select_authenticated" ON planes;
 CREATE POLICY "planes_select_authenticated" ON planes FOR SELECT TO authenticated USING (true);
 
 -- Overrides de features por tenant (permite al superadmin habilitar/deshabilitar

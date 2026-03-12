@@ -17,24 +17,29 @@ CREATE TABLE IF NOT EXISTS reviews (
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 
 -- Anon puede insertar reviews (formulario público) siempre que el tenant exista y esté activo
+DROP POLICY IF EXISTS "reviews_anon_insert" ON reviews;
 CREATE POLICY "reviews_anon_insert" ON reviews
   FOR INSERT TO anon
   WITH CHECK (tenant_id IN (SELECT id FROM tenants WHERE activo = true));
 
 -- Anon sólo ve reviews aprobadas
+DROP POLICY IF EXISTS "reviews_anon_select" ON reviews;
 CREATE POLICY "reviews_anon_select" ON reviews
   FOR SELECT TO anon
   USING (visible = true);
 
 -- Tenant autenticado puede ver, modificar y eliminar sus propias reviews
+DROP POLICY IF EXISTS "reviews_auth_select" ON reviews;
 CREATE POLICY "reviews_auth_select" ON reviews
   FOR SELECT TO authenticated
   USING (tenant_id = get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "reviews_auth_update" ON reviews;
 CREATE POLICY "reviews_auth_update" ON reviews
   FOR UPDATE TO authenticated
   USING (tenant_id = get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "reviews_auth_delete" ON reviews;
 CREATE POLICY "reviews_auth_delete" ON reviews
   FOR DELETE TO authenticated
   USING (tenant_id = get_tenant_id_for_user());

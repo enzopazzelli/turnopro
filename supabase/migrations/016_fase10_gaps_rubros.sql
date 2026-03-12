@@ -20,12 +20,13 @@ CREATE TABLE IF NOT EXISTS desparasitaciones (
 
 ALTER TABLE desparasitaciones ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "desparasitaciones_tenant" ON desparasitaciones;
 CREATE POLICY "desparasitaciones_tenant" ON desparasitaciones
   USING (tenant_id = get_tenant_id_for_user())
   WITH CHECK (tenant_id = get_tenant_id_for_user());
 
-CREATE INDEX idx_desparasitaciones_mascota ON desparasitaciones(mascota_id);
-CREATE INDEX idx_desparasitaciones_tenant ON desparasitaciones(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_desparasitaciones_mascota ON desparasitaciones(mascota_id);
+CREATE INDEX IF NOT EXISTS idx_desparasitaciones_tenant ON desparasitaciones(tenant_id);
 
 -- ============================================================
 -- ABOGADOS: Etapas procesales (timeline por expediente)
@@ -44,11 +45,12 @@ CREATE TABLE IF NOT EXISTS etapas_procesales (
 
 ALTER TABLE etapas_procesales ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "etapas_procesales_tenant" ON etapas_procesales;
 CREATE POLICY "etapas_procesales_tenant" ON etapas_procesales
   USING (tenant_id = get_tenant_id_for_user())
   WITH CHECK (tenant_id = get_tenant_id_for_user());
 
-CREATE INDEX idx_etapas_procesales_expediente ON etapas_procesales(expediente_id);
+CREATE INDEX IF NOT EXISTS idx_etapas_procesales_expediente ON etapas_procesales(expediente_id);
 
 -- ============================================================
 -- PSICOLOGÍA: Consentimientos informados
@@ -67,9 +69,10 @@ CREATE TABLE IF NOT EXISTS consentimientos_informados (
 
 ALTER TABLE consentimientos_informados ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "consentimientos_tenant" ON consentimientos_informados;
 CREATE POLICY "consentimientos_tenant" ON consentimientos_informados
   USING (tenant_id = get_tenant_id_for_user())
   WITH CHECK (tenant_id = get_tenant_id_for_user());
 
-CREATE INDEX idx_consentimientos_paciente ON consentimientos_informados(paciente_id);
-CREATE INDEX idx_consentimientos_tenant ON consentimientos_informados(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_consentimientos_paciente ON consentimientos_informados(paciente_id);
+CREATE INDEX IF NOT EXISTS idx_consentimientos_tenant ON consentimientos_informados(tenant_id);

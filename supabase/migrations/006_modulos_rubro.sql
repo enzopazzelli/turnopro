@@ -17,7 +17,7 @@ $$ LANGUAGE plpgsql;
 -- ODONTOLOGÍA (4 tablas)
 -- ============================================
 
-CREATE TABLE public.odontogramas (
+CREATE TABLE IF NOT EXISTS public.odontogramas (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   paciente_id UUID NOT NULL REFERENCES public.pacientes(id) ON DELETE CASCADE,
@@ -29,7 +29,7 @@ CREATE TABLE public.odontogramas (
   UNIQUE(paciente_id, tipo)
 );
 
-CREATE TABLE public.planes_tratamiento (
+CREATE TABLE IF NOT EXISTS public.planes_tratamiento (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   paciente_id UUID NOT NULL REFERENCES public.pacientes(id) ON DELETE CASCADE,
@@ -42,7 +42,7 @@ CREATE TABLE public.planes_tratamiento (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE public.etapas_tratamiento (
+CREATE TABLE IF NOT EXISTS public.etapas_tratamiento (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   plan_id UUID NOT NULL REFERENCES public.planes_tratamiento(id) ON DELETE CASCADE,
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
@@ -57,7 +57,7 @@ CREATE TABLE public.etapas_tratamiento (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE public.historias_clinicas_dentales (
+CREATE TABLE IF NOT EXISTS public.historias_clinicas_dentales (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   paciente_id UUID NOT NULL REFERENCES public.pacientes(id) ON DELETE CASCADE,
@@ -75,7 +75,7 @@ CREATE TABLE public.historias_clinicas_dentales (
 -- MEDICINA (3 tablas)
 -- ============================================
 
-CREATE TABLE public.historias_clinicas (
+CREATE TABLE IF NOT EXISTS public.historias_clinicas (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   paciente_id UUID NOT NULL REFERENCES public.pacientes(id) ON DELETE CASCADE,
@@ -92,7 +92,7 @@ CREATE TABLE public.historias_clinicas (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE public.signos_vitales (
+CREATE TABLE IF NOT EXISTS public.signos_vitales (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   paciente_id UUID NOT NULL REFERENCES public.pacientes(id) ON DELETE CASCADE,
@@ -109,7 +109,7 @@ CREATE TABLE public.signos_vitales (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE public.recetas (
+CREATE TABLE IF NOT EXISTS public.recetas (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   paciente_id UUID NOT NULL REFERENCES public.pacientes(id) ON DELETE CASCADE,
@@ -125,7 +125,7 @@ CREATE TABLE public.recetas (
 -- ABOGADOS (3 tablas)
 -- ============================================
 
-CREATE TABLE public.expedientes (
+CREATE TABLE IF NOT EXISTS public.expedientes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   paciente_id UUID NOT NULL REFERENCES public.pacientes(id) ON DELETE CASCADE,
@@ -142,7 +142,7 @@ CREATE TABLE public.expedientes (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE public.documentos_legales (
+CREATE TABLE IF NOT EXISTS public.documentos_legales (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   expediente_id UUID NOT NULL REFERENCES public.expedientes(id) ON DELETE CASCADE,
@@ -156,7 +156,7 @@ CREATE TABLE public.documentos_legales (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE public.vencimientos_legales (
+CREATE TABLE IF NOT EXISTS public.vencimientos_legales (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   expediente_id UUID REFERENCES public.expedientes(id) ON DELETE SET NULL,
@@ -174,7 +174,7 @@ CREATE TABLE public.vencimientos_legales (
 -- VETERINARIA (3 tablas)
 -- ============================================
 
-CREATE TABLE public.mascotas (
+CREATE TABLE IF NOT EXISTS public.mascotas (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   tutor_id UUID NOT NULL REFERENCES public.pacientes(id) ON DELETE CASCADE,
@@ -193,7 +193,7 @@ CREATE TABLE public.mascotas (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE public.vacunaciones (
+CREATE TABLE IF NOT EXISTS public.vacunaciones (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   mascota_id UUID NOT NULL REFERENCES public.mascotas(id) ON DELETE CASCADE,
@@ -206,7 +206,7 @@ CREATE TABLE public.vacunaciones (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE public.consultas_mascota (
+CREATE TABLE IF NOT EXISTS public.consultas_mascota (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   mascota_id UUID NOT NULL REFERENCES public.mascotas(id) ON DELETE CASCADE,
@@ -226,7 +226,7 @@ CREATE TABLE public.consultas_mascota (
 -- PSICOLOGÍA (4 tablas)
 -- ============================================
 
-CREATE TABLE public.notas_sesion (
+CREATE TABLE IF NOT EXISTS public.notas_sesion (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   paciente_id UUID NOT NULL REFERENCES public.pacientes(id) ON DELETE CASCADE,
@@ -242,7 +242,7 @@ CREATE TABLE public.notas_sesion (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE public.evoluciones (
+CREATE TABLE IF NOT EXISTS public.evoluciones (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   paciente_id UUID NOT NULL REFERENCES public.pacientes(id) ON DELETE CASCADE,
@@ -255,7 +255,7 @@ CREATE TABLE public.evoluciones (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE public.cuestionarios (
+CREATE TABLE IF NOT EXISTS public.cuestionarios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   nombre TEXT NOT NULL,
@@ -267,7 +267,7 @@ CREATE TABLE public.cuestionarios (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE public.respuestas_cuestionario (
+CREATE TABLE IF NOT EXISTS public.respuestas_cuestionario (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   cuestionario_id UUID NOT NULL REFERENCES public.cuestionarios(id) ON DELETE CASCADE,
@@ -283,7 +283,7 @@ CREATE TABLE public.respuestas_cuestionario (
 -- CONTADORES (3 tablas)
 -- ============================================
 
-CREATE TABLE public.vencimientos_fiscales (
+CREATE TABLE IF NOT EXISTS public.vencimientos_fiscales (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   paciente_id UUID REFERENCES public.pacientes(id) ON DELETE SET NULL,
@@ -299,7 +299,7 @@ CREATE TABLE public.vencimientos_fiscales (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE public.checklists_documentacion (
+CREATE TABLE IF NOT EXISTS public.checklists_documentacion (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   paciente_id UUID REFERENCES public.pacientes(id) ON DELETE SET NULL,
@@ -310,7 +310,7 @@ CREATE TABLE public.checklists_documentacion (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE public.checklist_items (
+CREATE TABLE IF NOT EXISTS public.checklist_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   checklist_id UUID NOT NULL REFERENCES public.checklists_documentacion(id) ON DELETE CASCADE,
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
@@ -327,90 +327,106 @@ CREATE TABLE public.checklist_items (
 -- ============================================
 
 -- Odontología
-CREATE INDEX idx_odontogramas_tenant ON public.odontogramas(tenant_id);
-CREATE INDEX idx_odontogramas_paciente ON public.odontogramas(paciente_id);
-CREATE INDEX idx_planes_tratamiento_tenant ON public.planes_tratamiento(tenant_id);
-CREATE INDEX idx_planes_tratamiento_paciente ON public.planes_tratamiento(paciente_id);
-CREATE INDEX idx_etapas_tratamiento_plan ON public.etapas_tratamiento(plan_id);
-CREATE INDEX idx_historias_dentales_tenant ON public.historias_clinicas_dentales(tenant_id);
-CREATE INDEX idx_historias_dentales_paciente ON public.historias_clinicas_dentales(paciente_id);
+CREATE INDEX IF NOT EXISTS idx_odontogramas_tenant ON public.odontogramas(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_odontogramas_paciente ON public.odontogramas(paciente_id);
+CREATE INDEX IF NOT EXISTS idx_planes_tratamiento_tenant ON public.planes_tratamiento(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_planes_tratamiento_paciente ON public.planes_tratamiento(paciente_id);
+CREATE INDEX IF NOT EXISTS idx_etapas_tratamiento_plan ON public.etapas_tratamiento(plan_id);
+CREATE INDEX IF NOT EXISTS idx_historias_dentales_tenant ON public.historias_clinicas_dentales(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_historias_dentales_paciente ON public.historias_clinicas_dentales(paciente_id);
 
 -- Medicina
-CREATE INDEX idx_historias_clinicas_tenant ON public.historias_clinicas(tenant_id);
-CREATE INDEX idx_historias_clinicas_paciente ON public.historias_clinicas(paciente_id);
-CREATE INDEX idx_signos_vitales_tenant ON public.signos_vitales(tenant_id);
-CREATE INDEX idx_signos_vitales_paciente ON public.signos_vitales(paciente_id);
-CREATE INDEX idx_recetas_tenant ON public.recetas(tenant_id);
-CREATE INDEX idx_recetas_paciente ON public.recetas(paciente_id);
+CREATE INDEX IF NOT EXISTS idx_historias_clinicas_tenant ON public.historias_clinicas(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_historias_clinicas_paciente ON public.historias_clinicas(paciente_id);
+CREATE INDEX IF NOT EXISTS idx_signos_vitales_tenant ON public.signos_vitales(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_signos_vitales_paciente ON public.signos_vitales(paciente_id);
+CREATE INDEX IF NOT EXISTS idx_recetas_tenant ON public.recetas(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_recetas_paciente ON public.recetas(paciente_id);
 
 -- Abogados
-CREATE INDEX idx_expedientes_tenant ON public.expedientes(tenant_id);
-CREATE INDEX idx_expedientes_paciente ON public.expedientes(paciente_id);
-CREATE INDEX idx_expedientes_estado ON public.expedientes(estado);
-CREATE INDEX idx_documentos_legales_tenant ON public.documentos_legales(tenant_id);
-CREATE INDEX idx_documentos_legales_expediente ON public.documentos_legales(expediente_id);
-CREATE INDEX idx_vencimientos_legales_tenant ON public.vencimientos_legales(tenant_id);
-CREATE INDEX idx_vencimientos_legales_fecha ON public.vencimientos_legales(fecha_vencimiento);
+CREATE INDEX IF NOT EXISTS idx_expedientes_tenant ON public.expedientes(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_expedientes_paciente ON public.expedientes(paciente_id);
+CREATE INDEX IF NOT EXISTS idx_expedientes_estado ON public.expedientes(estado);
+CREATE INDEX IF NOT EXISTS idx_documentos_legales_tenant ON public.documentos_legales(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_documentos_legales_expediente ON public.documentos_legales(expediente_id);
+CREATE INDEX IF NOT EXISTS idx_vencimientos_legales_tenant ON public.vencimientos_legales(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_vencimientos_legales_fecha ON public.vencimientos_legales(fecha_vencimiento);
 
 -- Veterinaria
-CREATE INDEX idx_mascotas_tenant ON public.mascotas(tenant_id);
-CREATE INDEX idx_mascotas_tutor ON public.mascotas(tutor_id);
-CREATE INDEX idx_vacunaciones_tenant ON public.vacunaciones(tenant_id);
-CREATE INDEX idx_vacunaciones_mascota ON public.vacunaciones(mascota_id);
-CREATE INDEX idx_consultas_mascota_tenant ON public.consultas_mascota(tenant_id);
-CREATE INDEX idx_consultas_mascota_mascota ON public.consultas_mascota(mascota_id);
+CREATE INDEX IF NOT EXISTS idx_mascotas_tenant ON public.mascotas(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_mascotas_tutor ON public.mascotas(tutor_id);
+CREATE INDEX IF NOT EXISTS idx_vacunaciones_tenant ON public.vacunaciones(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_vacunaciones_mascota ON public.vacunaciones(mascota_id);
+CREATE INDEX IF NOT EXISTS idx_consultas_mascota_tenant ON public.consultas_mascota(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_consultas_mascota_mascota ON public.consultas_mascota(mascota_id);
 
 -- Psicología
-CREATE INDEX idx_notas_sesion_tenant ON public.notas_sesion(tenant_id);
-CREATE INDEX idx_notas_sesion_paciente ON public.notas_sesion(paciente_id);
-CREATE INDEX idx_evoluciones_tenant ON public.evoluciones(tenant_id);
-CREATE INDEX idx_evoluciones_paciente ON public.evoluciones(paciente_id);
-CREATE INDEX idx_cuestionarios_tenant ON public.cuestionarios(tenant_id);
-CREATE INDEX idx_respuestas_cuestionario_tenant ON public.respuestas_cuestionario(tenant_id);
-CREATE INDEX idx_respuestas_cuestionario_paciente ON public.respuestas_cuestionario(paciente_id);
-CREATE INDEX idx_respuestas_cuestionario_cuestionario ON public.respuestas_cuestionario(cuestionario_id);
+CREATE INDEX IF NOT EXISTS idx_notas_sesion_tenant ON public.notas_sesion(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_notas_sesion_paciente ON public.notas_sesion(paciente_id);
+CREATE INDEX IF NOT EXISTS idx_evoluciones_tenant ON public.evoluciones(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_evoluciones_paciente ON public.evoluciones(paciente_id);
+CREATE INDEX IF NOT EXISTS idx_cuestionarios_tenant ON public.cuestionarios(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_respuestas_cuestionario_tenant ON public.respuestas_cuestionario(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_respuestas_cuestionario_paciente ON public.respuestas_cuestionario(paciente_id);
+CREATE INDEX IF NOT EXISTS idx_respuestas_cuestionario_cuestionario ON public.respuestas_cuestionario(cuestionario_id);
 
 -- Contadores
-CREATE INDEX idx_vencimientos_fiscales_tenant ON public.vencimientos_fiscales(tenant_id);
-CREATE INDEX idx_vencimientos_fiscales_fecha ON public.vencimientos_fiscales(fecha_vencimiento);
-CREATE INDEX idx_checklists_tenant ON public.checklists_documentacion(tenant_id);
-CREATE INDEX idx_checklists_paciente ON public.checklists_documentacion(paciente_id);
-CREATE INDEX idx_checklist_items_checklist ON public.checklist_items(checklist_id);
+CREATE INDEX IF NOT EXISTS idx_vencimientos_fiscales_tenant ON public.vencimientos_fiscales(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_vencimientos_fiscales_fecha ON public.vencimientos_fiscales(fecha_vencimiento);
+CREATE INDEX IF NOT EXISTS idx_checklists_tenant ON public.checklists_documentacion(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_checklists_paciente ON public.checklists_documentacion(paciente_id);
+CREATE INDEX IF NOT EXISTS idx_checklist_items_checklist ON public.checklist_items(checklist_id);
 
 -- ============================================
 -- TRIGGERS updated_at
 -- ============================================
 
+DROP TRIGGER IF EXISTS set_updated_at ON public.odontogramas;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.odontogramas
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.planes_tratamiento;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.planes_tratamiento
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.etapas_tratamiento;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.etapas_tratamiento
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.historias_clinicas_dentales;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.historias_clinicas_dentales
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.historias_clinicas;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.historias_clinicas
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.signos_vitales;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.signos_vitales
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.recetas;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.recetas
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.expedientes;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.expedientes
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.vencimientos_legales;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.vencimientos_legales
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.mascotas;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.mascotas
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.consultas_mascota;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.consultas_mascota
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.notas_sesion;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.notas_sesion
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.evoluciones;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.evoluciones
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.cuestionarios;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.cuestionarios
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.vencimientos_fiscales;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.vencimientos_fiscales
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+DROP TRIGGER IF EXISTS set_updated_at ON public.checklists_documentacion;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.checklists_documentacion
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
@@ -420,109 +436,131 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.checklists_documentacion
 
 -- Odontología
 ALTER TABLE public.odontogramas ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.odontogramas;
 CREATE POLICY "tenant_isolation" ON public.odontogramas FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 ALTER TABLE public.planes_tratamiento ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.planes_tratamiento;
 CREATE POLICY "tenant_isolation" ON public.planes_tratamiento FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 ALTER TABLE public.etapas_tratamiento ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.etapas_tratamiento;
 CREATE POLICY "tenant_isolation" ON public.etapas_tratamiento FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 ALTER TABLE public.historias_clinicas_dentales ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.historias_clinicas_dentales;
 CREATE POLICY "tenant_isolation" ON public.historias_clinicas_dentales FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 -- Medicina
 ALTER TABLE public.historias_clinicas ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.historias_clinicas;
 CREATE POLICY "tenant_isolation" ON public.historias_clinicas FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 ALTER TABLE public.signos_vitales ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.signos_vitales;
 CREATE POLICY "tenant_isolation" ON public.signos_vitales FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 ALTER TABLE public.recetas ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.recetas;
 CREATE POLICY "tenant_isolation" ON public.recetas FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 -- Abogados
 ALTER TABLE public.expedientes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.expedientes;
 CREATE POLICY "tenant_isolation" ON public.expedientes FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 ALTER TABLE public.documentos_legales ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_select" ON public.documentos_legales;
 CREATE POLICY "tenant_select" ON public.documentos_legales FOR SELECT
   USING (tenant_id = public.get_tenant_id_for_user());
+DROP POLICY IF EXISTS "tenant_insert" ON public.documentos_legales;
 CREATE POLICY "tenant_insert" ON public.documentos_legales FOR INSERT
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
+DROP POLICY IF EXISTS "tenant_delete" ON public.documentos_legales;
 CREATE POLICY "tenant_delete" ON public.documentos_legales FOR DELETE
   USING (tenant_id = public.get_tenant_id_for_user());
 
 ALTER TABLE public.vencimientos_legales ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.vencimientos_legales;
 CREATE POLICY "tenant_isolation" ON public.vencimientos_legales FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 -- Veterinaria
 ALTER TABLE public.mascotas ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.mascotas;
 CREATE POLICY "tenant_isolation" ON public.mascotas FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 ALTER TABLE public.vacunaciones ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.vacunaciones;
 CREATE POLICY "tenant_isolation" ON public.vacunaciones FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 ALTER TABLE public.consultas_mascota ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.consultas_mascota;
 CREATE POLICY "tenant_isolation" ON public.consultas_mascota FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 -- Psicología
 ALTER TABLE public.notas_sesion ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.notas_sesion;
 CREATE POLICY "tenant_isolation" ON public.notas_sesion FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 ALTER TABLE public.evoluciones ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.evoluciones;
 CREATE POLICY "tenant_isolation" ON public.evoluciones FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 ALTER TABLE public.cuestionarios ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.cuestionarios;
 CREATE POLICY "tenant_isolation" ON public.cuestionarios FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 ALTER TABLE public.respuestas_cuestionario ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.respuestas_cuestionario;
 CREATE POLICY "tenant_isolation" ON public.respuestas_cuestionario FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 -- Contadores
 ALTER TABLE public.vencimientos_fiscales ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.vencimientos_fiscales;
 CREATE POLICY "tenant_isolation" ON public.vencimientos_fiscales FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 ALTER TABLE public.checklists_documentacion ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.checklists_documentacion;
 CREATE POLICY "tenant_isolation" ON public.checklists_documentacion FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 ALTER TABLE public.checklist_items ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "tenant_isolation" ON public.checklist_items;
 CREATE POLICY "tenant_isolation" ON public.checklist_items FOR ALL
   USING (tenant_id = public.get_tenant_id_for_user())
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
@@ -534,24 +572,31 @@ CREATE POLICY "tenant_isolation" ON public.checklist_items FOR ALL
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES
   ('documentos', 'documentos', false, 10485760, ARRAY['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']),
-  ('mascotas', 'mascotas', true, 5242880, ARRAY['image/jpeg', 'image/png', 'image/webp']);
+  ('mascotas', 'mascotas', true, 5242880, ARRAY['image/jpeg', 'image/png', 'image/webp'])
+ON CONFLICT (id) DO NOTHING;
 
 -- Storage policies: documentos (privado)
+DROP POLICY IF EXISTS "tenant_upload_documentos" ON storage.objects;
 CREATE POLICY "tenant_upload_documentos" ON storage.objects FOR INSERT
   WITH CHECK (bucket_id = 'documentos' AND (storage.foldername(name))[1] = public.get_tenant_id_for_user()::text);
 
+DROP POLICY IF EXISTS "tenant_read_documentos" ON storage.objects;
 CREATE POLICY "tenant_read_documentos" ON storage.objects FOR SELECT
   USING (bucket_id = 'documentos' AND (storage.foldername(name))[1] = public.get_tenant_id_for_user()::text);
 
+DROP POLICY IF EXISTS "tenant_delete_documentos" ON storage.objects;
 CREATE POLICY "tenant_delete_documentos" ON storage.objects FOR DELETE
   USING (bucket_id = 'documentos' AND (storage.foldername(name))[1] = public.get_tenant_id_for_user()::text);
 
 -- Storage policies: mascotas (público lectura, upload por tenant)
+DROP POLICY IF EXISTS "public_read_mascotas" ON storage.objects;
 CREATE POLICY "public_read_mascotas" ON storage.objects FOR SELECT
   USING (bucket_id = 'mascotas');
 
+DROP POLICY IF EXISTS "tenant_upload_mascotas" ON storage.objects;
 CREATE POLICY "tenant_upload_mascotas" ON storage.objects FOR INSERT
   WITH CHECK (bucket_id = 'mascotas' AND (storage.foldername(name))[1] = public.get_tenant_id_for_user()::text);
 
+DROP POLICY IF EXISTS "tenant_delete_mascotas" ON storage.objects;
 CREATE POLICY "tenant_delete_mascotas" ON storage.objects FOR DELETE
   USING (bucket_id = 'mascotas' AND (storage.foldername(name))[1] = public.get_tenant_id_for_user()::text);

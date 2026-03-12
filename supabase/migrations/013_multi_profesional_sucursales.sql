@@ -18,9 +18,10 @@ CREATE TABLE IF NOT EXISTS public.sucursales (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_sucursales_tenant_id ON public.sucursales(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_sucursales_tenant_id ON public.sucursales(tenant_id);
 
 -- Trigger updated_at
+DROP TRIGGER IF EXISTS trigger_sucursales_updated_at ON public.sucursales;
 CREATE TRIGGER trigger_sucursales_updated_at
   BEFORE UPDATE ON public.sucursales
   FOR EACH ROW EXECUTE FUNCTION public.actualizar_updated_at();
@@ -28,18 +29,22 @@ CREATE TRIGGER trigger_sucursales_updated_at
 -- RLS
 ALTER TABLE public.sucursales ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Tenant puede ver sus sucursales" ON public.sucursales;
 CREATE POLICY "Tenant puede ver sus sucursales"
   ON public.sucursales FOR SELECT
   USING (tenant_id = (SELECT get_tenant_id_for_user()));
 
+DROP POLICY IF EXISTS "Tenant puede insertar sucursales" ON public.sucursales;
 CREATE POLICY "Tenant puede insertar sucursales"
   ON public.sucursales FOR INSERT
   WITH CHECK (tenant_id = (SELECT get_tenant_id_for_user()));
 
+DROP POLICY IF EXISTS "Tenant puede actualizar sus sucursales" ON public.sucursales;
 CREATE POLICY "Tenant puede actualizar sus sucursales"
   ON public.sucursales FOR UPDATE
   USING (tenant_id = (SELECT get_tenant_id_for_user()));
 
+DROP POLICY IF EXISTS "Tenant puede eliminar sus sucursales" ON public.sucursales;
 CREATE POLICY "Tenant puede eliminar sus sucursales"
   ON public.sucursales FOR DELETE
   USING (tenant_id = (SELECT get_tenant_id_for_user()));
@@ -66,23 +71,27 @@ CREATE TABLE IF NOT EXISTS public.invitaciones (
   expires_at TIMESTAMPTZ DEFAULT (now() + interval '7 days')
 );
 
-CREATE INDEX idx_invitaciones_tenant_id ON public.invitaciones(tenant_id);
-CREATE INDEX idx_invitaciones_token ON public.invitaciones(token);
+CREATE INDEX IF NOT EXISTS idx_invitaciones_tenant_id ON public.invitaciones(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_invitaciones_token ON public.invitaciones(token);
 
 ALTER TABLE public.invitaciones ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Tenant puede ver sus invitaciones" ON public.invitaciones;
 CREATE POLICY "Tenant puede ver sus invitaciones"
   ON public.invitaciones FOR SELECT
   USING (tenant_id = (SELECT get_tenant_id_for_user()));
 
+DROP POLICY IF EXISTS "Tenant puede crear invitaciones" ON public.invitaciones;
 CREATE POLICY "Tenant puede crear invitaciones"
   ON public.invitaciones FOR INSERT
   WITH CHECK (tenant_id = (SELECT get_tenant_id_for_user()));
 
+DROP POLICY IF EXISTS "Tenant puede actualizar invitaciones" ON public.invitaciones;
 CREATE POLICY "Tenant puede actualizar invitaciones"
   ON public.invitaciones FOR UPDATE
   USING (tenant_id = (SELECT get_tenant_id_for_user()));
 
+DROP POLICY IF EXISTS "Tenant puede eliminar invitaciones" ON public.invitaciones;
 CREATE POLICY "Tenant puede eliminar invitaciones"
   ON public.invitaciones FOR DELETE
   USING (tenant_id = (SELECT get_tenant_id_for_user()));

@@ -6,7 +6,7 @@
 -- ============================================
 -- TABLA: pagos
 -- ============================================
-CREATE TABLE pagos (
+CREATE TABLE IF NOT EXISTS pagos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
   cita_id UUID REFERENCES citas(id) ON DELETE SET NULL,
@@ -26,36 +26,41 @@ CREATE TABLE pagos (
 );
 
 -- Trigger updated_at (reutiliza funcion existente de 001)
+DROP TRIGGER IF EXISTS set_pagos_updated_at ON pagos;
 CREATE TRIGGER set_pagos_updated_at
   BEFORE UPDATE ON pagos
   FOR EACH ROW
   EXECUTE FUNCTION public.actualizar_updated_at();
 
 -- Indices
-CREATE INDEX idx_pagos_tenant_id ON pagos(tenant_id);
-CREATE INDEX idx_pagos_cita_id ON pagos(cita_id);
-CREATE INDEX idx_pagos_paciente_id ON pagos(paciente_id);
-CREATE INDEX idx_pagos_fecha_pago ON pagos(fecha_pago);
+CREATE INDEX IF NOT EXISTS idx_pagos_tenant_id ON pagos(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_pagos_cita_id ON pagos(cita_id);
+CREATE INDEX IF NOT EXISTS idx_pagos_paciente_id ON pagos(paciente_id);
+CREATE INDEX IF NOT EXISTS idx_pagos_fecha_pago ON pagos(fecha_pago);
 
 -- RLS
 ALTER TABLE pagos ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "pagos_select" ON pagos;
 CREATE POLICY "pagos_select" ON pagos
   FOR SELECT USING (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "pagos_insert" ON pagos;
 CREATE POLICY "pagos_insert" ON pagos
   FOR INSERT WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "pagos_update" ON pagos;
 CREATE POLICY "pagos_update" ON pagos
   FOR UPDATE USING (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "pagos_delete" ON pagos;
 CREATE POLICY "pagos_delete" ON pagos
   FOR DELETE USING (tenant_id = public.get_tenant_id_for_user());
 
 -- ============================================
 -- TABLA: recibos
 -- ============================================
-CREATE TABLE recibos (
+CREATE TABLE IF NOT EXISTS recibos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
   pago_id UUID NOT NULL REFERENCES pagos(id) ON DELETE CASCADE,
@@ -68,21 +73,25 @@ CREATE TABLE recibos (
 );
 
 -- Indices
-CREATE INDEX idx_recibos_tenant_id ON recibos(tenant_id);
-CREATE INDEX idx_recibos_pago_id ON recibos(pago_id);
+CREATE INDEX IF NOT EXISTS idx_recibos_tenant_id ON recibos(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_recibos_pago_id ON recibos(pago_id);
 
 -- RLS
 ALTER TABLE recibos ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "recibos_select" ON recibos;
 CREATE POLICY "recibos_select" ON recibos
   FOR SELECT USING (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "recibos_insert" ON recibos;
 CREATE POLICY "recibos_insert" ON recibos
   FOR INSERT WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "recibos_update" ON recibos;
 CREATE POLICY "recibos_update" ON recibos
   FOR UPDATE USING (tenant_id = public.get_tenant_id_for_user());
 
+DROP POLICY IF EXISTS "recibos_delete" ON recibos;
 CREATE POLICY "recibos_delete" ON recibos
   FOR DELETE USING (tenant_id = public.get_tenant_id_for_user());
 

@@ -8,6 +8,7 @@
 -- ============================================
 
 -- professionals: acceso anon para ver datos del profesional (tenant activo)
+DROP POLICY IF EXISTS "Acceso publico a profesionales de tenants activos" ON public.professionals;
 CREATE POLICY "Acceso publico a profesionales de tenants activos"
   ON public.professionals FOR SELECT
   TO anon
@@ -19,6 +20,7 @@ CREATE POLICY "Acceso publico a profesionales de tenants activos"
   );
 
 -- users: acceso anon limitado (solo profesionales de tenants activos — expone nombre_completo y avatar_url)
+DROP POLICY IF EXISTS "Acceso publico a usuarios profesionales" ON public.users;
 CREATE POLICY "Acceso publico a usuarios profesionales"
   ON public.users FOR SELECT
   TO anon
@@ -31,6 +33,7 @@ CREATE POLICY "Acceso publico a usuarios profesionales"
   );
 
 -- fechas_bloqueadas: acceso anon para saber que dias no hay atencion
+DROP POLICY IF EXISTS "Acceso publico a fechas bloqueadas" ON public.fechas_bloqueadas;
 CREATE POLICY "Acceso publico a fechas bloqueadas"
   ON public.fechas_bloqueadas FOR SELECT
   TO anon

@@ -14,7 +14,7 @@ ALTER TABLE disponibilidad DROP CONSTRAINT IF EXISTS disponibilidad_professional
 ALTER TABLE disponibilidad ADD COLUMN IF NOT EXISTS bloque INTEGER NOT NULL DEFAULT 1;
 
 -- Nuevo constraint unique con bloque
-ALTER TABLE disponibilidad ADD CONSTRAINT disponibilidad_professional_dia_bloque_key
+ALTER TABLE disponibilidad ADD CONSTRAINT IF NOT EXISTS disponibilidad_professional_dia_bloque_key
   UNIQUE(professional_id, dia_semana, bloque);
 
 -- Actualizar la funcion de inicializacion para incluir bloque
@@ -226,12 +226,14 @@ CREATE TABLE IF NOT EXISTS public.solicitudes_demo (
 ALTER TABLE public.solicitudes_demo ENABLE ROW LEVEL SECURITY;
 
 -- Permitir que cualquiera (anon) inserte solicitudes
+DROP POLICY IF EXISTS "Insertar solicitudes de demo anon" ON public.solicitudes_demo;
 CREATE POLICY "Insertar solicitudes de demo anon"
   ON public.solicitudes_demo FOR INSERT
   TO anon, authenticated
   WITH CHECK (true);
 
 -- Solo superadmin puede ver (cuando se implemente)
+DROP POLICY IF EXISTS "Superadmin puede ver solicitudes" ON public.solicitudes_demo;
 CREATE POLICY "Superadmin puede ver solicitudes"
   ON public.solicitudes_demo FOR SELECT
   TO authenticated

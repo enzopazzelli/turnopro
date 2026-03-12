@@ -29,17 +29,18 @@ CREATE TABLE IF NOT EXISTS notificaciones (
 );
 
 -- Indices
-CREATE INDEX idx_notificaciones_tenant ON notificaciones(tenant_id);
-CREATE INDEX idx_notificaciones_usuario ON notificaciones(usuario_id);
-CREATE INDEX idx_notificaciones_tipo ON notificaciones(tipo);
-CREATE INDEX idx_notificaciones_canal ON notificaciones(canal);
-CREATE INDEX idx_notificaciones_estado ON notificaciones(estado);
-CREATE INDEX idx_notificaciones_no_leidas ON notificaciones(usuario_id, leida) WHERE leida = FALSE;
-CREATE INDEX idx_notificaciones_cita ON notificaciones(cita_id);
-CREATE INDEX idx_notificaciones_created ON notificaciones(created_at DESC);
-CREATE INDEX idx_notificaciones_inbox ON notificaciones(usuario_id, leida, created_at DESC) WHERE canal = 'in_app';
+CREATE INDEX IF NOT EXISTS idx_notificaciones_tenant ON notificaciones(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_notificaciones_usuario ON notificaciones(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_notificaciones_tipo ON notificaciones(tipo);
+CREATE INDEX IF NOT EXISTS idx_notificaciones_canal ON notificaciones(canal);
+CREATE INDEX IF NOT EXISTS idx_notificaciones_estado ON notificaciones(estado);
+CREATE INDEX IF NOT EXISTS idx_notificaciones_no_leidas ON notificaciones(usuario_id, leida) WHERE leida = FALSE;
+CREATE INDEX IF NOT EXISTS idx_notificaciones_cita ON notificaciones(cita_id);
+CREATE INDEX IF NOT EXISTS idx_notificaciones_created ON notificaciones(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notificaciones_inbox ON notificaciones(usuario_id, leida, created_at DESC) WHERE canal = 'in_app';
 
 -- Trigger updated_at (reutiliza la funcion existente)
+DROP TRIGGER IF EXISTS set_notificaciones_updated_at ON notificaciones;
 CREATE TRIGGER set_notificaciones_updated_at
   BEFORE UPDATE ON notificaciones
   FOR EACH ROW
@@ -51,21 +52,25 @@ CREATE TRIGGER set_notificaciones_updated_at
 ALTER TABLE notificaciones ENABLE ROW LEVEL SECURITY;
 
 -- SELECT: usuarios ven notificaciones de su tenant
+DROP POLICY IF EXISTS "Usuarios ven notificaciones de su tenant" ON notificaciones;
 CREATE POLICY "Usuarios ven notificaciones de su tenant"
   ON notificaciones FOR SELECT
   USING (tenant_id = public.get_tenant_id_for_user());
 
 -- INSERT: usuarios pueden crear notificaciones en su tenant
+DROP POLICY IF EXISTS "Usuarios crean notificaciones en su tenant" ON notificaciones;
 CREATE POLICY "Usuarios crean notificaciones en su tenant"
   ON notificaciones FOR INSERT
   WITH CHECK (tenant_id = public.get_tenant_id_for_user());
 
 -- UPDATE: usuarios pueden actualizar notificaciones de su tenant
+DROP POLICY IF EXISTS "Usuarios actualizan notificaciones de su tenant" ON notificaciones;
 CREATE POLICY "Usuarios actualizan notificaciones de su tenant"
   ON notificaciones FOR UPDATE
   USING (tenant_id = public.get_tenant_id_for_user());
 
 -- DELETE: usuarios pueden eliminar notificaciones de su tenant
+DROP POLICY IF EXISTS "Usuarios eliminan notificaciones de su tenant" ON notificaciones;
 CREATE POLICY "Usuarios eliminan notificaciones de su tenant"
   ON notificaciones FOR DELETE
   USING (tenant_id = public.get_tenant_id_for_user());

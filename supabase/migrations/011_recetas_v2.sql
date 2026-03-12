@@ -42,18 +42,22 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('firmas', 'firmas', true)
 ON CONFLICT (id) DO NOTHING;
 
+DROP POLICY IF EXISTS "firma_upload" ON storage.objects;
 CREATE POLICY "firma_upload" ON storage.objects
   FOR INSERT TO authenticated
   WITH CHECK (bucket_id = 'firmas');
 
+DROP POLICY IF EXISTS "firma_select" ON storage.objects;
 CREATE POLICY "firma_select" ON storage.objects
   FOR SELECT TO authenticated
   USING (bucket_id = 'firmas');
 
+DROP POLICY IF EXISTS "firma_update" ON storage.objects;
 CREATE POLICY "firma_update" ON storage.objects
   FOR UPDATE TO authenticated
   USING (bucket_id = 'firmas');
 
+DROP POLICY IF EXISTS "firma_delete" ON storage.objects;
 CREATE POLICY "firma_delete" ON storage.objects
   FOR DELETE TO authenticated
   USING (bucket_id = 'firmas');

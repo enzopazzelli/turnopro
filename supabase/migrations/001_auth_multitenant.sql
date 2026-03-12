@@ -6,7 +6,7 @@
 -- ============================================
 -- 1. TABLA: tenants (consultorios/negocios)
 -- ============================================
-CREATE TABLE public.tenants (
+CREATE TABLE IF NOT EXISTS public.tenants (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   slug TEXT NOT NULL UNIQUE,
   nombre TEXT NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE public.tenants (
 -- ============================================
 -- 2. TABLA: users (usuarios de la plataforma)
 -- ============================================
-CREATE TABLE public.users (
+CREATE TABLE IF NOT EXISTS public.users (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   auth_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
@@ -41,7 +41,7 @@ CREATE TABLE public.users (
 -- ============================================
 -- 3. TABLA: professionals (datos del profesional)
 -- ============================================
-CREATE TABLE public.professionals (
+CREATE TABLE IF NOT EXISTS public.professionals (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
@@ -56,12 +56,12 @@ CREATE TABLE public.professionals (
 -- ============================================
 -- 4. INDICES
 -- ============================================
-CREATE INDEX idx_tenants_slug ON public.tenants(slug);
-CREATE INDEX idx_users_tenant_id ON public.users(tenant_id);
-CREATE INDEX idx_users_auth_id ON public.users(auth_id);
-CREATE INDEX idx_users_email ON public.users(email);
-CREATE INDEX idx_professionals_tenant_id ON public.professionals(tenant_id);
-CREATE INDEX idx_professionals_user_id ON public.professionals(user_id);
+CREATE INDEX IF NOT EXISTS idx_tenants_slug ON public.tenants(slug);
+CREATE INDEX IF NOT EXISTS idx_users_tenant_id ON public.users(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_users_auth_id ON public.users(auth_id);
+CREATE INDEX IF NOT EXISTS idx_users_email ON public.users(email);
+CREATE INDEX IF NOT EXISTS idx_professionals_tenant_id ON public.professionals(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_professionals_user_id ON public.professionals(user_id);
 
 -- ============================================
 -- 5. TRIGGER: actualizar updated_at
@@ -74,14 +74,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_tenants_updated_at ON public.tenants;
 CREATE TRIGGER trigger_tenants_updated_at
   BEFORE UPDATE ON public.tenants
   FOR EACH ROW EXECUTE FUNCTION public.actualizar_updated_at();
 
+DROP TRIGGER IF EXISTS trigger_users_updated_at ON public.users;
 CREATE TRIGGER trigger_users_updated_at
   BEFORE UPDATE ON public.users
   FOR EACH ROW EXECUTE FUNCTION public.actualizar_updated_at();
 
+DROP TRIGGER IF EXISTS trigger_professionals_updated_at ON public.professionals;
 CREATE TRIGGER trigger_professionals_updated_at
   BEFORE UPDATE ON public.professionals
   FOR EACH ROW EXECUTE FUNCTION public.actualizar_updated_at();
@@ -106,12 +109,14 @@ ALTER TABLE public.professionals ENABLE ROW LEVEL SECURITY;
 -- ============================================
 
 -- Usuarios autenticados ven solo su tenant
+DROP POLICY IF EXISTS "Usuarios ven su tenant" ON public.tenants;
 CREATE POLICY "Usuarios ven su tenant"
   ON public.tenants FOR SELECT
   TO authenticated
   USING (id = public.get_tenant_id_for_user());
 
 -- Profesionales pueden actualizar su tenant
+DROP POLICY IF EXISTS "Profesionales actualizan su tenant" ON public.tenants;
 CREATE POLICY "Profesionales actualizan su tenant"
   ON public.tenants FOR UPDATE
   TO authenticated
@@ -119,6 +124,7 @@ CREATE POLICY "Profesionales actualizan su tenant"
   WITH CHECK (id = public.get_tenant_id_for_user());
 
 -- Acceso anonimo a tenants activos (pagina publica)
+DROP POLICY IF EXISTS "Acceso publico a tenants activos" ON public.tenants;
 CREATE POLICY "Acceso publico a tenants activos"
   ON public.tenants FOR SELECT
   TO anon
@@ -129,12 +135,14 @@ CREATE POLICY "Acceso publico a tenants activos"
 -- ============================================
 
 -- Usuarios ven usuarios de su mismo tenant
+DROP POLICY IF EXISTS "Usuarios ven su tenant" ON public.users;
 CREATE POLICY "Usuarios ven su tenant"
   ON public.users FOR SELECT
   TO authenticated
   USING (tenant_id = public.get_tenant_id_for_user());
 
 -- Usuarios pueden actualizar su propio registro
+DROP POLICY IF EXISTS "Usuarios actualizan su perfil" ON public.users;
 CREATE POLICY "Usuarios actualizan su perfil"
   ON public.users FOR UPDATE
   TO authenticated
@@ -146,12 +154,14 @@ CREATE POLICY "Usuarios actualizan su perfil"
 -- ============================================
 
 -- Usuarios ven profesionales de su tenant
+DROP POLICY IF EXISTS "Usuarios ven profesionales de su tenant" ON public.professionals;
 CREATE POLICY "Usuarios ven profesionales de su tenant"
   ON public.professionals FOR SELECT
   TO authenticated
   USING (tenant_id = public.get_tenant_id_for_user());
 
 -- Profesionales actualizan su propio registro
+DROP POLICY IF EXISTS "Profesionales actualizan su perfil" ON public.professionals;
 CREATE POLICY "Profesionales actualizan su perfil"
   ON public.professionals FOR UPDATE
   TO authenticated

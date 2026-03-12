@@ -9,17 +9,21 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- Lectura publica (las imagenes de perfil son publicas)
+DROP POLICY IF EXISTS "public_read_perfiles" ON storage.objects;
 CREATE POLICY "public_read_perfiles" ON storage.objects FOR SELECT
   USING (bucket_id = 'perfiles');
 
 -- Upload por tenant (carpeta = tenant_id)
+DROP POLICY IF EXISTS "tenant_upload_perfiles" ON storage.objects;
 CREATE POLICY "tenant_upload_perfiles" ON storage.objects FOR INSERT
   WITH CHECK (bucket_id = 'perfiles' AND (storage.foldername(name))[1] = public.get_tenant_id_for_user()::text);
 
 -- Delete por tenant
+DROP POLICY IF EXISTS "tenant_delete_perfiles" ON storage.objects;
 CREATE POLICY "tenant_delete_perfiles" ON storage.objects FOR DELETE
   USING (bucket_id = 'perfiles' AND (storage.foldername(name))[1] = public.get_tenant_id_for_user()::text);
 
 -- Update por tenant (para upsert)
+DROP POLICY IF EXISTS "tenant_update_perfiles" ON storage.objects;
 CREATE POLICY "tenant_update_perfiles" ON storage.objects FOR UPDATE
   USING (bucket_id = 'perfiles' AND (storage.foldername(name))[1] = public.get_tenant_id_for_user()::text);
