@@ -11,6 +11,8 @@ export async function GET(request) {
 
   let authError = null;
 
+  console.log("[callback] params:", { code: !!code, token_hash: !!token_hash, type, admin_access: searchParams.get("admin_access") });
+
   if (code) {
     // Intercambio de código OAuth (Google, etc.)
     const { error } = await supabase.auth.exchangeCodeForSession(code);
@@ -19,11 +21,14 @@ export async function GET(request) {
     // Verificación de magic link / OTP
     const { error } = await supabase.auth.verifyOtp({ token_hash, type });
     authError = error;
+    console.log("[callback] verifyOtp error:", error?.message ?? "none");
   } else {
+    console.log("[callback] → invalid_callback");
     return NextResponse.redirect(`${origin}/login?error=invalid_callback`);
   }
 
   if (authError) {
+    console.log("[callback] → auth_error:", authError.message);
     return NextResponse.redirect(`${origin}/login?error=auth_error`);
   }
 
@@ -40,6 +45,8 @@ export async function GET(request) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  console.log("[callback] user:", user?.id ?? "null");
+
   if (!user) {
     return NextResponse.redirect(`${origin}/login?error=no_user`);
   }
@@ -50,16 +57,20 @@ export async function GET(request) {
   });
   const perfil = rows?.[0] ?? null;
 
+  console.log("[callback] perfil:", perfil ? `${perfil.rol}` : "null");
+
   if (perfil) {
     if (perfil.rol === "superadmin") {
+      console.log("[callback] → /superadmin");
       return NextResponse.redirect(`${origin}/superadmin`);
     }
     const destino = adminAccess
       ? `${origin}/dashboard?admin_access=true`
       : `${origin}/dashboard`;
+    console.log("[callback] → destino:", destino);
     return NextResponse.redirect(destino);
   } else {
-    // Usuario nuevo sin perfil → completar onboarding
+    console.log("[callback] → /onboarding");
     return NextResponse.redirect(`${origin}/onboarding`);
   }
 }
