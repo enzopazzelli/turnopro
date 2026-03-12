@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find D:\\\\User\\\\Desktop\\\\citas-app\\\\src\\\\app\\\\\\(dashboard\\):*)",
+      "Bash(npm run:*)",
+      "Bash(ls:*)"
+    ]
+  }
+}
