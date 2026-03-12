@@ -69,6 +69,7 @@ export async function actualizarPlan(planId, { features, limites, precio, descri
   });
 
   revalidatePath("/superadmin/planes");
+  revalidatePath("/");
   return { error: null };
 }
 
