@@ -323,11 +323,18 @@ export async function impersonarTenant(tenantId) {
   const { data, error } = await admin.auth.admin.generateLink({
     type: "magiclink",
     email: usuario.email,
-    options: { redirectTo: `${siteUrl}/api/auth/callback?admin_access=true` },
+    options: { redirectTo: `${siteUrl}/dashboard` },
   });
 
   if (error) return { data: null, error: "Error al generar el link" };
-  return { data: { link: data.properties?.action_link, email: usuario.email, nombre: usuario.nombre_completo }, error: null };
+
+  // Construimos la URL de callback directamente con el hashed_token, evitando
+  // depender del redirect de Supabase (que usa implicit flow y pierde query params)
+  const hashedToken = data.properties?.hashed_token;
+  if (!hashedToken) return { data: null, error: "No se pudo obtener el token" };
+  const link = `${siteUrl}/api/auth/callback?token_hash=${hashedToken}&type=magiclink&admin_access=true`;
+
+  return { data: { link, email: usuario.email, nombre: usuario.nombre_completo }, error: null };
 }
 
 // ============================================================
@@ -384,12 +391,14 @@ export async function generarLinkAcceso(email) {
   const { data, error } = await admin.auth.admin.generateLink({
     type: "magiclink",
     email,
-    options: {
-      redirectTo: `${siteUrl}/api/auth/callback?admin_access=true`,
-    },
+    options: { redirectTo: `${siteUrl}/dashboard` },
   });
 
   if (error) return { data: null, error: "Error al generar el link" };
+
+  const hashedToken = data.properties?.hashed_token;
+  if (!hashedToken) return { data: null, error: "No se pudo obtener el token" };
+  const link = `${siteUrl}/api/auth/callback?token_hash=${hashedToken}&type=magiclink&admin_access=true`;
 
   await registrarAuditLog({
     user_id: adminUser.id,
@@ -397,7 +406,7 @@ export async function generarLinkAcceso(email) {
     datos: { email },
   });
 
-  return { data: { link: data.properties?.action_link }, error: null };
+  return { data: { link }, error: null };
 }
 
 export async function activarDesactivarUsuario(userId, activo) {
