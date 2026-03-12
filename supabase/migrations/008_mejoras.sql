@@ -14,7 +14,8 @@ ALTER TABLE disponibilidad DROP CONSTRAINT IF EXISTS disponibilidad_professional
 ALTER TABLE disponibilidad ADD COLUMN IF NOT EXISTS bloque INTEGER NOT NULL DEFAULT 1;
 
 -- Nuevo constraint unique con bloque
-ALTER TABLE disponibilidad ADD CONSTRAINT IF NOT EXISTS disponibilidad_professional_dia_bloque_key
+ALTER TABLE disponibilidad DROP CONSTRAINT IF EXISTS disponibilidad_professional_dia_bloque_key;
+ALTER TABLE disponibilidad ADD CONSTRAINT disponibilidad_professional_dia_bloque_key
   UNIQUE(professional_id, dia_semana, bloque);
 
 -- Actualizar la funcion de inicializacion para incluir bloque
