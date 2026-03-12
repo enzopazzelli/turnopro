@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { OnboardingWizard } from "@/components/auth/onboarding-wizard";
 import { CalendarDays } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
@@ -20,13 +21,16 @@ export default async function OnboardingPage() {
   }
 
   // Si ya tiene registro en users, redirigir al dashboard
-  const { data: existente } = await supabase
+  // Usamos adminClient para bypass RLS
+  const adminClient = createAdminClient();
+  const { data: existente } = await adminClient
     .from("users")
-    .select("id")
+    .select("id, rol")
     .eq("auth_id", user.id)
     .maybeSingle();
 
   if (existente) {
+    if (existente.rol === "superadmin") redirect("/superadmin");
     redirect("/dashboard");
   }
 
