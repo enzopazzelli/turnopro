@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { SidebarSuperadmin } from "@/components/superadmin/sidebar-superadmin";
 
 export default async function SuperadminLayout({ children }) {
@@ -11,7 +12,8 @@ export default async function SuperadminLayout({ children }) {
 
   if (!user) redirect("/login");
 
-  const { data: usuario } = await supabase
+  const adminClient = createAdminClient();
+  const { data: usuario } = await adminClient
     .from("users")
     .select("rol, nombre_completo")
     .eq("auth_id", user.id)

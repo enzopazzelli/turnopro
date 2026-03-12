@@ -37,9 +37,12 @@ export async function iniciarSesion(prevState, formData) {
   }
 
   // Audit log + detectar rol para redirect
+  // Usamos adminClient para bypass RLS: auth.uid() puede ser null
+  // en server actions justo después de signInWithPassword
   let redirectTo = "/dashboard";
   if (authData?.user) {
-    const { data: usuario } = await supabase
+    const adminClient = createAdminClient();
+    const { data: usuario } = await adminClient
       .from("users")
       .select("id, tenant_id, rol")
       .eq("auth_id", authData.user.id)

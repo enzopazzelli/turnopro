@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { SidebarDesktop } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import { AuthProvider } from "@/components/layout/auth-provider";
@@ -19,8 +20,9 @@ export default async function DashboardLayout({ children }) {
     redirect("/login");
   }
 
-  // Fetch user profile from our users table
-  const { data: usuario } = await supabase
+  // Fetch user profile — admin client bypasses RLS (auth.uid() puede ser null en SSR)
+  const adminClient = createAdminClient();
+  const { data: usuario } = await adminClient
     .from("users")
     .select("*")
     .eq("auth_id", user.id)
